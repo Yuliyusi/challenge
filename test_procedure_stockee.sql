@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Nov 18, 2022 at 09:46 AM
+-- Generation Time: Dec 05, 2022 at 07:58 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.3.13
 
@@ -3760,7 +3760,7 @@ ALTER TABLE `etat_civil`
 -- AUTO_INCREMENT for table `hobbies`
 --
 ALTER TABLE `hobbies`
-  MODIFY `ID_HOBBY` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID_HOBBY` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `identite`

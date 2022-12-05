@@ -5,7 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="<?= base_url()?>bootstrap-5.0.2-dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="<?= base_url()?>bootstrap-5.0.2-dist/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" type="text/css" href="<?= base_url()?>bootstrap-5.0.2-dist/css/bootstrap-multiselect.css">
+  <!-- <link rel="stylesheet" type="text/css" href="<?= base_url()?>bootstrap-5.0.2-dist/css/bootstrap-multiselect.css"> -->
+
 	<title>PROCEDURE STOCKE</title>
 </head>
 <body style="padding: 10px;">
@@ -22,70 +23,99 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Identification</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <form id="formidentite" onsubmit="">
         <div class="row">
+          
           <div class="col-6">
-            <label>Nom</label>
+            <label>Nom<span class="text-danger">*</span></label>
             <input type="text" name="NOM" id="NOM" class="form-control">
+            <span id="errorNOM" class="text-danger"></span>
           </div>
           <div class="col-6">
-            <label>Sexe</label>
+            <label>Sexe<span class="text-danger">*</span></label>
             <select class="form-control" id="SEXE_ID" name="SEXE_ID" >
+              <option value="">Select</option>
+              <?php foreach ($sexe as $keysexe) {
+                // code...
+               ?>
+              <option value="<?= $keysexe['SEXE_ID'] ?>"><?= $keysexe['SEXE_DESCR'] ?></option>
+              <?php } ?>
+              
+            </select>
+            <span id="errorSEXE_ID" class="text-danger"></span>
+          </div>
+          <div class="col-6">
+            <label>Etat civil<span class="text-danger">*</span></label>
+            <select class="form-control" id="ETAT_CIVIL_ID" name="ETAT_CIVIL_ID">
+              <option value="">Select</option>
+              <?php foreach ($etat_civil as $keyetat_civil) {
+                // code...
+               ?>
+              <option value="<?= $keyetat_civil['ETAT_CIVIL_ID'] ?>"><?= $keyetat_civil['DESCRIPTION'] ?></option>
+              <?php } ?>              
+            </select>
+            <span id="errorETAT_CIVIL_ID" class="text-danger"></span>           
+          </div>
+          <div class="col-6">
+            <label>Province<span class="text-danger">*</span></label>
+            <select class="form-control" id="PROVINCE_ID" name="PROVINCE_ID" onchange="getLocaliteByParent(this.value,'COMMUNE_ID',1)">
+              <option value="">Select</option>
+              <?php foreach ($provinces as $keyprovinces) {
+                // code...
+               ?>
+              <option value="<?= $keyprovinces['PROVINCE_ID'] ?>"><?= $keyprovinces['PROVINCE_NAME'] ?></option>
+              <?php } ?>               
+            </select>
+            <span id="errorPROVINCE_ID" class="text-danger"></span>              
+          </div>
+          <div class="col-6">
+            <label>Commune<span class="text-danger">*</span></label>
+            <select class="form-control" id="COMMUNE_ID" name="COMMUNE_ID" onchange="getLocaliteByParent(this.value,'ZONE_ID',2)">
               <option value="">Select</option>
               
             </select>
+             <span id="errorCOMMUNE_ID" class="text-danger"></span>           
           </div>
           <div class="col-6">
-            <label>Etat civil</label>
-            <select class="form-control" id="ETAT_CIVIL_ID" name="ETAT_CIVIL_ID">
+            <label>Zone<span class="text-danger">*</span></label>
+            <select class="form-control" id="ZONE_ID" name="ZONE_ID" onchange="getLocaliteByParent(this.value,'COLLINE_ID',3)">
               <option value="">Select</option>
               
-            </select>            
+            </select>
+            <span id="errorZONE_ID" class="text-danger"></span>  
+                      
           </div>
           <div class="col-6">
-            <label>Province</label>
-            <select class="form-control" id="PROVINCE_ID" name="PROVINCE_ID">
+            <label>Colline<span class="text-danger">*</span></label>
+            <select class="form-control" id="COLLINE_ID" name="COLLINE_ID">
               <option value="">Select</option>
               
-            </select>            
+            </select>
+            <span id="errorCOLLINE_ID" class="text-danger"></span>             
           </div>
           <div class="col-6">
-            <label>Commune</label>
-            <select class="form-control" id="COMMUNE_ID" name="COMMUNE_ID">
+            <label>Hobby<span class="text-danger">*</span></label>
+            <select class="form-control selectpicker" id="ID_HOBBY" name="ID_HOBBY[]" multiple>
               <option value="">Select</option>
-              
-            </select>            
-          </div>
-          <div class="col-6">
-            <label>Zone</label>
-            <select class="form-control" id="ZONE_ID" name="ZONE_ID">
-              <option value="">Select</option>
-              
-            </select>            
-          </div>
-          <div class="col-6">
-            <label>Colline</label>
-            <select class="form-control" id="ZONE_ID" name="ZONE_ID">
-              <option value="">Select</option>
-              
-            </select>            
-          </div>
-          <div class="col-6">
-            <label>Hobby</label>
-            <select class="form-control" id="ID_HOBBY" name="ID_HOBBY">
-              <option value="">Select</option>
-              
-            </select>            
+              <?php foreach ($hobbies as $keyhobbies) {
+                // code...
+               ?>
+              <option value="<?= $keyhobbies['ID_HOBBY'] ?>"><?= $keyhobbies['HOBBY'] ?></option>
+              <?php } ?>                 
+            </select>
+            <span id="errorID_HOBBY" class="text-danger"></span>            
           </div> 
-
+         
         </div>
+         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="addData()">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -125,23 +155,116 @@
 
   </tbody>
 </table>    
-  </div>
+ </div>
 </div>
 </body>
 
 <script  src="<?= base_url()?>bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
 <script  src="<?= base_url()?>bootstrap-5.0.2-dist/js/jquery-3.6.1.min.js"></script>
 <script  src="<?= base_url()?>bootstrap-5.0.2-dist/js/jquery.dataTables.min.js"></script>
-<script  src="<?= base_url()?>bootstrap-5.0.2-dist/js/bootstrap-multiselect.js"></script>
 <script type="text/javascript">
-    $(document).ready(function() {
-        $('#example-dropUp').multiselect({
-            enableFiltering: true,
-            includeSelectAllOption: true,
-            maxHeight: 400,
-            dropUp: true
+ function getLocaliteByParent(idparrent,idtorender,level) {
+   // body...
+   let url="<?= base_url('PsTest/getLocaliteByParent')?>"
+   $.post(
+    url,
+    {
+     idparrent:idparrent,
+     idtorender:idtorender,
+     level:level
+    },
+    function(data) {
+     // body...
+     document.getElementById(idtorender).innerHTML=data
+   })
+
+ }
+ function validateForm() {
+   // body...
+  let NOM = document.forms["formidentite"]["NOM"].value;
+  let SEXE_ID = document.forms["formidentite"]["SEXE_ID"].value;
+  let ETAT_CIVIL_ID = document.forms["formidentite"]["ETAT_CIVIL_ID"].value;
+  let PROVINCE_ID = document.forms["formidentite"]["PROVINCE_ID"].value;
+  let COMMUNE_ID = document.forms["formidentite"]["COMMUNE_ID"].value;
+  let ZONE_ID = document.forms["formidentite"]["ZONE_ID"].value; 
+  let COLLINE_ID = document.forms["formidentite"]["COLLINE_ID"].value; 
+  let ID_HOBBY = document.forms["formidentite"]["ID_HOBBY"].value; 
+  if (NOM=="") {
+    document.getElementById('errorNOM').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorNOM').innerHTML="";
+  }
+  if (SEXE_ID=="") {
+    document.getElementById('errorSEXE_ID').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorSEXE_ID').innerHTML="";
+  }
+  if (ETAT_CIVIL_ID=="") {
+    document.getElementById('errorETAT_CIVIL_ID').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorETAT_CIVIL_ID').innerHTML="";
+  } 
+  if (PROVINCE_ID=="") {
+    document.getElementById('errorPROVINCE_ID').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorPROVINCE_ID').innerHTML="";
+  }
+  if (COMMUNE_ID=="") {
+    document.getElementById('errorCOMMUNE_ID').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorCOMMUNE_ID').innerHTML="";
+  } 
+  if (ZONE_ID=="") {
+    document.getElementById('errorZONE_ID').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorZONE_ID').innerHTML="";
+  }
+  if (COLLINE_ID=="") {
+    document.getElementById('errorCOLLINE_ID').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorCOLLINE_ID').innerHTML="";
+  } 
+  if (ID_HOBBY=="") {
+    document.getElementById('errorID_HOBBY').innerHTML="Required";
+    return false;
+  }else{
+    document.getElementById('errorID_HOBBY').innerHTML="";
+  }             
+ }
+
+function addData() {
+  // body...
+  if (validateForm()!==false) {
+      // Assign handlers immediately after making the request,
+      // and remember the jqxhr object for this request
+    const formData=$( "#formidentite" ).serialize();
+    const url="<?= base_url('PsTest/Add')?>"
+      var jqxhr = $.post( url,formData, function(data) {
+        alert( data );
+      })
+        .done(function(data) {
+          alert(data)
+        })
+        .fail(function() {
+          alert( "error" );
+        })
+        .always(function() {
+          alert( "finished" );
         });
-    });
+  }else{
+
+    alert("probleme")
+  }
+}
+
+
 </script>
 <script type="text/javascript">
 $( document ).ready(function() {

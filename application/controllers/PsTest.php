@@ -13,10 +13,114 @@ class PsTest extends CI_Controller
 	public function index($value='')
 	{
 		// code...
-		$this->load->view('PsTest_View');
+    $provColumnselect="`PROVINCE_ID`, `PROVINCE_NAME`";//colone a selectionner
+    $provTable="`provinces`";//table
+    $provWhere="1";//condition dans la clause where
+    $provOrderby="`PROVINCE_NAME` ASC";//order by
+    $bindparams = array('provColumnselect' => $provColumnselect,'provTable'=>$provTable,'provWhere'=>$provWhere,'provOrderby'=>$provOrderby );
+    $provrequete="CALL `getRequete`(?,?,?,?);";
+    $provinces = $this->ModelPs->getRequete($provrequete,$bindparams);
+    
+    ######################################################
+    $sexeColumnselect="*";//colone a selectionner
+    $sexeTable="`sexe`";//table
+    $sexeWhere="1";//condition dans la clause where
+    $sexeOrderby="`SEXE_DESCR` ASC";//order by
+    $bindparams = array('sexeColumnselect' =>$sexeColumnselect ,'sexeTable'=>$sexeTable,'sexeWhere'=>$sexeWhere,'sexeOrderby'=>$sexeOrderby);
+
+    $sexerequete="CALL `getRequete`(?,?,?,?);";
+    $sexe = $this->ModelPs->getRequete($sexerequete,$bindparams);
+    ######################################################
+    $hobyColumnselect="*";//colone a selectionner
+    $hobyTable="`hobbies`";//table
+    $hobyWhere="1";//condition dans la clause where
+    $hobyOrderby="`HOBBY` ASC";//order by
+    $bindparams = array('hobyColumnselect' => $hobyColumnselect,'hobyTable'=>$hobyTable,'hobyWhere'=>$hobyWhere,'hobyOrderby'=>$hobyOrderby );
+    $hobyrequete="CALL `getRequete`(?,?,?,?);";
+    $hobbies = $this->ModelPs->getRequete($hobyrequete,$bindparams);
+    ######################################################
+    $etatcivilColumnselect="*";//colone a selectionner
+    $etatcivilTable="`etat_civil`";//table
+    $etatcivilWhere="1";//condition dans la clause where
+    $etatcivilOrderby="`DESCRIPTION` ASC";//order by
+    $bindparams = array('etatcivilColumnselect' =>$etatcivilColumnselect ,'etatcivilTable'=>$etatcivilTable,'etatcivilWhere'=>$etatcivilWhere,'etatcivilOrderby'=>$etatcivilOrderby );
+    $etatcivilrequete="CALL `getRequete`(?,?,?,?);";
+    $etat_civil = $this->ModelPs->getRequete($etatcivilrequete,$bindparams);            
+    $data=array('provinces'=>$provinces,'sexe'=>$sexe,'hobbies'=>$hobbies,'etat_civil'=>$etat_civil);
+
+		$this->load->view('PsTest_View',$data);
 	}
-   public function listing($value=0)
-   {
+  public function getLocaliteByParent()
+  {
+    // code...
+    $level=$this->input->post('level');
+    $idparrent=$this->input->post('idparrent');
+    $idtorender=$this->input->post('idtorender');
+    $option="<option value=''>Select</option>";
+    if ($level=="2") {
+      // code...zone
+      $collone="ZONE_ID id,ZONE_NAME name";
+      $table="zones";
+      $where="COMMUNE_ID=".$idparrent;
+      $orderby="ZONE_NAME ASC ";
+      $requete="CALL `getRequete`('$collone','$table','$where','$orderby');";
+      $localite=$this->ModelPs->getRequete($requete);
+    }elseif ($level=="1") {
+      // code...commune
+      $collone="COMMUNE_ID id,COMMUNE_NAME name";
+      $table="communes";
+      $where="PROVINCE_ID=".$idparrent;
+      $orderby="COMMUNE_NAME ASC ";
+      $requete="CALL `getRequete`('$collone','$table','$where','$orderby');";
+      $localite=$this->ModelPs->getRequete($requete);
+    }else{
+      //code...colline
+      $collone="COLLINE_ID id,COLLINE_NAME name";
+      $table="collines";
+      $where="ZONE_ID=".$idparrent;
+      $orderby="COLLINE_NAME ASC ";
+      $requete="CALL `getRequete`('$collone','$table','$where','$orderby');";
+      $localite=$this->ModelPs->getRequete($requete);
+    }
+    foreach ($localite as $key ) {
+      // code...
+      $option.="<option value='".$key['id']."'>".$key['name']."</option>";
+    }
+    echo $option;
+
+  }
+  public function Add($value='')
+  {
+      // code...
+      $insertIntoTable="identite";
+      $ID_HOBBY=$this->input->post('ID_HOBBY');
+      $NOM=$this->input->post('NOM');
+      $ID_HOBBY=$this->input->post('ID_HOBBY');
+      $SEXE_ID=$this->input->post('SEXE_ID');
+      $ETAT_CIVIL_ID=$this->input->post('ETAT_CIVIL_ID');
+      // $PROVINCE_ID=$this->input->post('PROVINCE_ID');
+      // $COMMUNE_ID=$this->input->post('COMMUNE_ID');
+      // $ZONE_ID=$this->input->post('ZONE_ID');
+      $COLLINE_ID=$this->input->post('COLLINE_ID');
+
+      $datatoinsert='"'.$NOM.'",'.$SEXE_ID.','.$ETAT_CIVIL_ID.','.$COLLINE_ID;
+      $bindparams = array('insertIntoTable' =>$insertIntoTable ,'datatoinsert'=>$datatoinsert );
+      $insertRequete="CALL `insertLastIdIntoTable`(?,?);";
+      $IDENTITE_ID=$this->ModelPs->getRequeteOne($insertRequete,$bindparams);
+      $insertIntoTable="identite_hobby";
+        // code...
+      foreach ($ID_HOBBY as $key => $ID_HOBBY) {
+        // code...
+        $datatoinsert=$ID_HOBBY.','.$IDENTITE_ID['id'];
+        $bindparams = array('insertIntoTable' =>$insertIntoTable ,'datatoinsert'=>$datatoinsert );
+        $insertRequete="CALL `insertIntoTable`(?,?);";
+        $this->ModelPs->createUpdateDelete($insertRequete,$bindparams);
+      }
+    
+
+  }
+  public function listing($value=0)
+  {
 
 
           $var_search = !empty($_POST['search']['value']) ? $_POST['search']['value'] : null;
