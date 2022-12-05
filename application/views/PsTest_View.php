@@ -6,30 +6,31 @@
 	<link rel="stylesheet" type="text/css" href="<?= base_url()?>bootstrap-5.0.2-dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="<?= base_url()?>bootstrap-5.0.2-dist/css/jquery.dataTables.min.css">
   <!-- <link rel="stylesheet" type="text/css" href="<?= base_url()?>bootstrap-5.0.2-dist/css/bootstrap-multiselect.css"> -->
-
+<link rel="stylesheet" href="<?= base_url()?>font-awesome-4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="<?= base_url()?>sweetalert2-11.6.15/package/dist/sweetalert2.min.css">
 	<title>PROCEDURE STOCKE</title>
 </head>
 <body style="padding: 10px;">
 <div class="row">
   <!-- Button trigger modal -->
 <div class="col-2">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  <button onclick="$('#formidentite').get(0).reset();$('select option').removeAttr('selected');$('#btnenregistr').html('Enregistrer')" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nouveauidentite">
   Nouveaux
 </button>
 </div>
 
 <!-- Modal -->
-<div class="modal fade modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade modal-xl" id="nouveauidentite" tabindex="-1" aria-labelledby="nouveauidentiteLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Identification</h5>
+        <h5 class="modal-title" id="nouveauidentiteLabel">Identification</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="formidentite" onsubmit="">
         <div class="row">
-          
+          <input type="hidden" name="IDENTITE_ID" id="IDENTITE_ID">
           <div class="col-6">
             <label>Nom<span class="text-danger">*</span></label>
             <input type="text" name="NOM" id="NOM" class="form-control">
@@ -115,7 +116,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button type="button" class="btn btn-primary" onclick="addData()">Enregistrer</button>
+        <button id="btnenregistr" type="button" class="btn btn-primary" onclick="addData()">Enregistrer</button>
       </div>
     </div>
   </div>
@@ -132,6 +133,7 @@
       <th scope="col">SEXE</th>
       <th scope="col">ETAT CIVIL</th>
       <th scope="col">COLLINE</th>
+      <th scope="col">OPTIONS</th>
     </tr>
   </thead>
   <tbody>
@@ -158,7 +160,7 @@
  </div>
 </div>
 </body>
-
+<script  src="<?= base_url()?>sweetalert2-11.6.15/package/dist/sweetalert2.min.js"></script>
 <script  src="<?= base_url()?>bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
 <script  src="<?= base_url()?>bootstrap-5.0.2-dist/js/jquery-3.6.1.min.js"></script>
 <script  src="<?= base_url()?>bootstrap-5.0.2-dist/js/jquery.dataTables.min.js"></script>
@@ -242,22 +244,46 @@
 function addData() {
   // body...
   if (validateForm()!==false) {
-      // Assign handlers immediately after making the request,
-      // and remember the jqxhr object for this request
-    const formData=$( "#formidentite" ).serialize();
-    const url="<?= base_url('PsTest/Add')?>"
-      var jqxhr = $.post( url,formData, function(data) {
-        alert( data );
-      })
-        .done(function(data) {
-          alert(data)
-        })
-        .fail(function() {
-          alert( "error" );
-        })
-        .always(function() {
-          alert( "finished" );
-        });
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              // Assign handlers immediately after making the request,
+              // and remember the jqxhr object for this request
+            const formData=$( "#formidentite" ).serialize();
+            const url="<?= base_url('PsTest/Add')?>"
+            var jqxhr = $.post( url,formData, function(data) {
+              if (JSON.parse(data)==1) {
+                  get_list()//avec procedure stocke
+                  get_listN()//sans ps
+                  Swal.fire(
+                    'Fait!',
+                    'Operation faite avec succes.',
+                    'success'
+                  )         
+              }
+               
+              })
+                // .done(function(data) {
+                //   alert(data)
+                // })
+                .fail(function() {
+                  alert( "error" );
+                })
+                // .always(function() {
+                //   alert( "finished" );
+                // });
+          }
+})
+
+
   }else{
 
     alert("probleme")
@@ -376,5 +402,62 @@ $( document ).ready(function() {
 }
 
 
+</script>
+<script type="text/javascript">
+  function getOne(IDENTITE_ID) {
+    // body...
+    //alert(IDENTITE_ID)
+    let url="<?= base_url('PsTest/getOne')?>";
+    $.post(url,{IDENTITE_ID:IDENTITE_ID},function(data) {
+      // body...
+      let donne=JSON.parse(data);
+      $('#IDENTITE_ID').val(donne.identite.IDENTITE_ID)
+      $('#NOM').val(donne.identite.NOM)
+      $('#SEXE_ID').html(donne.sexes)
+      $('#ID_HOBBY').html(donne.hobbies)
+      $('#PROVINCE_ID').html(donne.provinces)
+      $('#COMMUNE_ID').html(donne.communes)
+      $('#ZONE_ID').html(donne.zones)
+      $('#COLLINE_ID').html(donne.collines)
+      $('#ETAT_CIVIL_ID').html(donne.etacivil)
+      $('#btnenregistr').html("Modifier")
+      $('#nouveauidentite').modal('show')
+      //alert(donne.identite.NOM)
+    })
+  }
+
+  //////////////////////////////
+  function deleteData(IDENTITE_ID) {
+    // body...
+    let url="<?=base_url()?>PsTest/deleteData/"
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.post(url,{IDENTITE_ID:IDENTITE_ID},function (data) {
+          // body...
+          if (data==1) {
+            get_list()
+            get_listN()
+            Swal.fire(
+              'Deleted!',
+              'Your file has been deleted.',
+              'success'
+            )            
+          }
+        })
+
+      }
+    })   
+  }
+  function deleteAction() {
+    // body...
+  }
 </script>
 </html>
